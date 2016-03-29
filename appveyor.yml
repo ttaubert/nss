@@ -1,13 +1,13 @@
 os: Visual Studio 2015
 
-init:
-- ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
-
 before_build:
-  - hg clone https://hg.mozilla.org/mozilla-build/ C:\projects\mozilla-build
+  - choco install mozillabuild
   - hg clone https://hg.mozilla.org/projects/nspr C:\projects\nspr
-  - C:\projects\mozilla-build\start-shell-msvc2015-x64.bat
+  - C:\mozilla-build\start-shell-msvc2015-x64.bat
   - cd /c/projects/nss; USE_64=1 make nss_build_all
+
+before_test:
+  - cd /c/projects/nss/tests/; USE_64=1 NSS_TESTS="ssl_gtests pk11_gtests der_gtests util_gtests" NSS_CYCLES=standard ./all.sh
 
 on_finish:
 - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
