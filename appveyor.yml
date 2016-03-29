@@ -1,7 +1,5 @@
 before_build:
-  - hg clone https://hg.mozilla.org/mozilla-build/
-  - hg clone https://hg.mozilla.org/projects/nspr
-  - cd mozilla-build
-  - start-shell-msvc2015-x64.bat
-  - cd nss
-  - USE_64=1 make nss_build_all
+  - hg clone https://hg.mozilla.org/mozilla-build/ C:\projects\mozilla-build
+  - hg clone https://hg.mozilla.org/projects/nspr C:\projects\nspr
+  - cd C:\projects\mozilla-build; start-shell-msvc2015-x64.bat
+  - cd C:\projects\nss; USE_64=1 make nss_build_all
