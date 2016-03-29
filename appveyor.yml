@@ -1,5 +1,7 @@
+os: Visual Studio 2015
+
 before_build:
   - hg clone https://hg.mozilla.org/mozilla-build/ C:\projects\mozilla-build
   - hg clone https://hg.mozilla.org/projects/nspr C:\projects\nspr
-  - cd C:\projects\mozilla-build; start-shell-msvc2015-x64.bat
-  - cd C:\projects\nss; USE_64=1 make nss_build_all
+  - C:\projects\mozilla-build\start-shell-msvc2015-x64.bat
+  - cd /c/projects/nss; USE_64=1 make nss_build_all
