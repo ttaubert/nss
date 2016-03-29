@@ -2,7 +2,7 @@ init:
   - hg clone https://hg.mozilla.org/mozilla-build/
   - hg clone https://hg.mozilla.org/projects/nspr
 
-build:
+before_build:
   - cd mozilla-build
   - start-shell-msvc2015-x64.bat
   - cd nss
