@@ -97,9 +97,9 @@ typedef enum {
     ssl_auth_dsa = 2,
     ssl_auth_kea = 3, /* unused */
     ssl_auth_ecdsa = 4,
-    ssl_auth_ecdh_rsa = 5, /* ECDH cert with an RSA signature */
+    ssl_auth_ecdh_rsa = 5,   /* ECDH cert with an RSA signature */
     ssl_auth_ecdh_ecdsa = 6, /* ECDH cert with an ECDSA signature */
-    ssl_auth_rsa_sign = 7, /* RSA PKCS#1.5 signing */
+    ssl_auth_rsa_sign = 7,   /* RSA PKCS#1.5 signing */
     ssl_auth_rsa_pss = 8,
     ssl_auth_psk = 9,
     ssl_auth_size /* number of authentication types */
@@ -145,13 +145,13 @@ typedef struct SSLExtraServerCertDataStr {
      * compatible types. */
     SSLAuthType authType;
     /* The remainder of the certificate chain. */
-    const CERTCertificateList *certChain;
+    const CERTCertificateList* certChain;
     /* A set of one or more stapled OCSP responses for the certificate.  This is
      * used to generate the OCSP stapling answer provided by the server. */
-    const SECItemArray *stapledOCSPResponses;
+    const SECItemArray* stapledOCSPResponses;
     /* A serialized sign_certificate_timestamp extension, used to answer
      * requests from clients for this data. */
-    const SECItem *signedCertTimestamps;
+    const SECItem* signedCertTimestamps;
 } SSLExtraServerCertData;
 
 typedef struct SSLChannelInfoStr {
@@ -202,10 +202,10 @@ typedef struct SSLChannelInfoStr {
 /* Use these macros to access the entries in SSLChannelInfo that are named
  * starting with "UseMacroToAccess_" */
 #define SSL_CHANNEL_INFO_FIELD_EXISTS(info, field) \
-   ((info).length >= (offsetof(SSLChannelInfo, UseMacroToAccess_##field) + sizeof((info).UseMacroToAccess_##field)))
+    ((info).length >= (offsetof(SSLChannelInfo, UseMacroToAccess_##field) + sizeof((info).UseMacroToAccess_##field)))
 
-#define SSL_CHANNEL_INFO_FIELD_GET(info,field) \
-   (SSL_CHANNEL_INFO_FIELD_EXISTS(info,field) ? info.UseMacroToAccess_##field : -1)
+#define SSL_CHANNEL_INFO_FIELD_GET(info, field) \
+    (SSL_CHANNEL_INFO_FIELD_EXISTS(info, field) ? info.UseMacroToAccess_##field : -1)
 
 /* Preliminary channel info */
 #define ssl_preinfo_version (1U << 0)
@@ -302,7 +302,7 @@ typedef enum {
     ssl_padding_xtn = 21,
     ssl_extended_master_secret_xtn = 23,
     ssl_session_ticket_xtn = 35,
-    ssl_tls13_key_share_xtn = 40, /* unofficial TODO(ekr) */
+    ssl_tls13_key_share_xtn = 40,      /* unofficial TODO(ekr) */
     ssl_tls13_pre_shared_key_xtn = 41, /* unofficial TODO(ekr) */
     ssl_next_proto_nego_xtn = 13172,
     ssl_renegotiation_info_xtn = 0xff01,
