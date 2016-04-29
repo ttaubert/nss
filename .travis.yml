@@ -39,9 +39,8 @@ install:
   - hg clone https://hg.mozilla.org/projects/nspr ../nspr
 
 script:
-  - echo $TRAVIS_OS_NAME
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then export CC="gcc-5"; export CCC="g++-5"; fi
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew update; brew install llvm38; fi;
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then export CC="gcc-5"; export CCC="g++-5"; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; brew install llvm38; fi;
   - if [ -n "$CLANG_FORMAT" ];
     then
       automation/travis/subdir-clang-format.sh lib/ssl;
