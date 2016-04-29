@@ -1,15 +1,11 @@
 #!/bin/sh
 
-if test -z $1
-then
-        echo "usage: $0 <Directory to reformat with clang-format>"
-        exit
-fi
-
-export ORIG=".orig"
-for file in `(find $1 -type f -name "*.c" && find $1 -type f -name "*.h")`;
-do
-  echo $file
-  mv "$file" "$file$ORIG"
-  clang-format-3.8 "$file$ORIG" > "$file"
+STATUS=0
+for i in $(find . -type f -name '*.[ch]' -print); do
+  if ! clang-format $i | diff $i - > tmpDiff; then
+    echo "Sorry, $i is not formatted properly. Please use clang-format 3.8 on your patch before landing."
+    cat tmpDiff
+    STATUS=1
+  fi
 done
+exit $STATUS
