@@ -10,7 +10,7 @@ addons:
     sources:
     # add PPAs with more up-to-date toolchains
     - ubuntu-toolchain-r-test
-    - llvm-toolchain-trusty-3.8
+    - llvm-toolchain-precise-3.8
     packages:
     # install toolchains
     - gcc-5
