@@ -24,12 +24,21 @@ matrix:
       env: BUILD_OPT=1
     - os: linux
       compiler: gcc
+      env:
+        - CC=gcc-5
+        - CCC=g++-5
     - os: linux
       compiler: gcc
-      env: BUILD_OPT=1
+      env:
+        - CC=gcc-5
+        - CCC=g++-5
+        - BUILD_OPT=1
     - os: linux
       compiler: gcc
-      env: USE_ASAN=1
+      env:
+        - CC=gcc-5
+        - CCC=g++-5
+        - USE_ASAN=1
     - os: linux
       env: CLANG_FORMAT=1
   allow_failures:
@@ -39,8 +48,7 @@ install:
   - hg clone https://hg.mozilla.org/projects/nspr ../nspr
 
 script:
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then export CC="gcc-5"; export CCC="g++-5"; fi
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; brew install llvm38; fi;
+  # - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; brew install llvm38; fi
   - if [ -n "$CLANG_FORMAT" ];
     then
       automation/travis/subdir-clang-format.sh lib/ssl;
