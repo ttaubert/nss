@@ -10,7 +10,11 @@
 #include "pkcs11.h"
 #include <nspr.h>
 #include <stdio.h>
+#ifdef _WIN32
+#include <string.h>
+#else
 #include <strings.h>
+#endif
 #include <assert.h>
 
 #include <time.h>
