@@ -671,24 +671,24 @@ main(int argv, char **argc)
 
     /* read command-line arguments */
     for (i = 1; i < argv; i++) {
-        if (strcasecmp(argc[i], "-i") == 0) {
+        if (PL_strcasecmp(argc[i], "-i") == 0) {
             i++;
             iterations = atoi(argc[i]);
-        } else if (strcasecmp(argc[i], "-t") == 0) {
+        } else if (PL_strcasecmp(argc[i], "-t") == 0) {
             i++;
             numThreads = atoi(argc[i]);
-        } else if (strcasecmp(argc[i], "-A") == 0) {
+        } else if (PL_strcasecmp(argc[i], "-A") == 0) {
             ansi = nist = secp = 1;
             usepkcs11 = usefreebl = 1;
-        } else if (strcasecmp(argc[i], "-a") == 0) {
+        } else if (PL_strcasecmp(argc[i], "-a") == 0) {
             ansi = 1;
-        } else if (strcasecmp(argc[i], "-n") == 0) {
+        } else if (PL_strcasecmp(argc[i], "-n") == 0) {
             nist = 1;
-        } else if (strcasecmp(argc[i], "-s") == 0) {
+        } else if (PL_strcasecmp(argc[i], "-s") == 0) {
             secp = 1;
-        } else if (strcasecmp(argc[i], "-p") == 0) {
+        } else if (PL_strcasecmp(argc[i], "-p") == 0) {
             usepkcs11 = 1;
-        } else if (strcasecmp(argc[i], "-f") == 0) {
+        } else if (PL_strcasecmp(argc[i], "-f") == 0) {
             usefreebl = 1;
         } else {
             printUsage(argc[0]);
