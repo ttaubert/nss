@@ -17,10 +17,6 @@
 #endif
 #include <assert.h>
 
-#include <time.h>
-#include <sys/time.h>
-#include <sys/resource.h>
-
 #define __PASTE(x, y) x##y
 
 /*
