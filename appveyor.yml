@@ -1,7 +1,10 @@
 os: Visual Studio 2015
 
-before_build:
-  - choco install mozillabuild
+install:
+  - cinst mozillabuild
+
+build:
+  # - choco install mozillabuild
   - hg clone https://hg.mozilla.org/projects/nspr C:\projects\nspr
   - xcopy C:\projects\nss\automation\start-shell-msvc2015-x64.bat C:\mozilla-build\ /Y
   - xcopy C:\projects\nss\automation\start-shell.bat C:\mozilla-build\ /Y
