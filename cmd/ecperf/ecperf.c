@@ -8,14 +8,8 @@
 #include "nss.h"
 #include "secutil.h"
 #include "pkcs11.h"
-#include <nspr.h>
+#include "nspr.h"
 #include <stdio.h>
-#ifdef _WIN32
-#include <string.h>
-#else
-#include <strings.h>
-#endif
-#include <assert.h>
 
 #define __PASTE(x, y) x##y
 
