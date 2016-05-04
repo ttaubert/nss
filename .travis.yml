@@ -70,6 +70,6 @@ notifications:
   irc:
     channels:
       - "irc.mozilla.org:6697/#nssbot"
-    nick: travisci
+    nick: travisci-franziskus
     on_success: change
     on_failure: always
