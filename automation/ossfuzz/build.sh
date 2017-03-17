@@ -34,7 +34,7 @@ cp fuzz/options/*.options $OUT/
 
 # Build the library (non-TLS fuzzing mode).
 CXX="$CXX -stdlib=libc++" LDFLAGS="$CFLAGS" \
-    ./build.sh -c -v --fuzz=oss --fuzz --disable-tests
+    ./build.sh -c -v --fuzz=oss --disable-tests
 
 # Copy fuzzing targets.
 for fuzzer in $(find ../dist/Debug/bin -name "nssfuzz-*" -printf "%f\n"); do
