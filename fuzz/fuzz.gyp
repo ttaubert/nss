@@ -289,6 +289,9 @@
         'tls_client_config.cc',
         'tls_client_target.cc',
       ],
+      'include_dirs': [
+        '<(DEPTH)/fuzz/libFuzzer/',
+      ],
       'dependencies': [
         '<(DEPTH)/exports.gyp:nss_exports',
         '<(DEPTH)/cpputil/cpputil.gyp:cpputil',
@@ -302,6 +305,9 @@
         'tls_server_certs.cc',
         'tls_server_config.cc',
         'tls_server_target.cc',
+      ],
+      'include_dirs': [
+        '<(DEPTH)/fuzz/libFuzzer/',
       ],
       'dependencies': [
         '<(DEPTH)/exports.gyp:nss_exports',
@@ -317,7 +323,10 @@
         'tls_client_target.cc',
       ],
       'defines': [
-        'IS_DTLS'
+        'IS_DTLS_2'
+      ],
+      'include_dirs': [
+        '<(DEPTH)/fuzz/libFuzzer/',
       ],
       'dependencies': [
         '<(DEPTH)/exports.gyp:nss_exports',
@@ -334,7 +343,10 @@
         'tls_server_target.cc',
       ],
       'defines': [
-        'IS_DTLS'
+        'IS_DTLS_2'
+      ],
+      'include_dirs': [
+        '<(DEPTH)/fuzz/libFuzzer/',
       ],
       'dependencies': [
         '<(DEPTH)/exports.gyp:nss_exports',

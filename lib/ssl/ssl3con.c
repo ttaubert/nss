@@ -10248,8 +10248,8 @@ ssl3_HandleNewSessionTicket(sslSocket *ss, PRUint8 *b, PRUint32 length)
     PORT_Assert(ss->opt.noLocks || ssl_HaveRecvBufLock(ss));
     PORT_Assert(ss->opt.noLocks || ssl_HaveSSL3HandshakeLock(ss));
 
-    PORT_Assert(!ss->ssl3.hs.newSessionTicket.ticket.data);
-    PORT_Assert(!ss->ssl3.hs.receivedNewSessionTicket);
+    //PORT_Assert(!ss->ssl3.hs.newSessionTicket.ticket.data); TODO
+    //PORT_Assert(!ss->ssl3.hs.receivedNewSessionTicket); TODO
 
     if (ss->ssl3.hs.ws != wait_new_session_ticket) {
         SSL3_SendAlert(ss, alert_fatal, unexpected_message);

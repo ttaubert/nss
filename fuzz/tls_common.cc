@@ -5,6 +5,7 @@
 #include <assert.h>
 
 #include "ssl.h"
+#include "sslerr.h"
 
 #include "tls_common.h"
 
@@ -27,7 +28,7 @@ void EnableAllCipherSuites(PRFileDesc* fd) {
   }
 }
 
-void DoHandshake(PRFileDesc* fd, bool isServer) {
+SECStatus DoHandshake(PRFileDesc* fd, bool isServer) {
   SECStatus rv = SSL_ResetHandshake(fd, isServer);
   assert(rv == SECSuccess);
 
@@ -45,4 +46,6 @@ void DoHandshake(PRFileDesc* fd, bool isServer) {
       PR_Write(fd, block, nb);
     }
   }
+
+  return rv;
 }

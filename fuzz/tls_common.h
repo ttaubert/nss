@@ -9,6 +9,6 @@
 
 PRStatus EnableAllProtocolVersions();
 void EnableAllCipherSuites(PRFileDesc* fd);
-void DoHandshake(PRFileDesc* fd, bool isServer);
+SECStatus DoHandshake(PRFileDesc* fd, bool isServer);
 
 #endif  // tls_common_h__
