@@ -99,35 +99,38 @@ ssl3_HandleServerNameXtn(const sslSocket *ss, TLSExtensionData *xtnData,
             goto loser;
         }
 
+        /* We support no NameTypes other than host_name. Fail if we encounter
+         * anything else, we don't know how to interpret its payload. */
+        if (type != sni_nametype_hostname) {
+            goto alert_loser;
+        }
+
         /* Read ServerName (length and value). */
         rv = ssl3_ExtConsumeHandshakeVariable(ss, &tmp, 2, &data->data, &data->len);
         if (rv != SECSuccess) {
             goto loser;
         }
 
-        /* Record the value for host_name(0). */
-        if (type == sni_nametype_hostname) {
-            /* Fail if we encounter a second host_name entry. */
-            if (names) {
-                goto alert_loser;
-            }
-
-            /* Create an array for the only supported NameType. */
-            names = PORT_ZNewArray(SECItem, 1);
-            if (!names) {
-                goto loser;
-            }
-
-            /* Copy ServerName into the array. */
-            if (SECITEM_CopyItem(NULL, &names[0], &tmp) != SECSuccess) {
-                goto loser;
-            }
+        /* HostName can't be empty. */
+        if (tmp.len == 0) {
+            goto alert_loser;
         }
 
-        /* Even if we don't support NameTypes other than host_name at the
-         * moment, we continue parsing the whole list to check its validity.
-         * We do not check for duplicate entries with NameType != host_name(0).
-         */
+        /* Fail if we encounter a second host_name entry. */
+        if (names) {
+            goto alert_loser;
+        }
+
+        /* Create an array for the only supported NameType. */
+        names = PORT_ZNewArray(SECItem, 1);
+        if (!names) {
+            goto loser;
+        }
+
+        /* Copy ServerName into the array. */
+        if (SECITEM_CopyItem(NULL, &names[0], &tmp) != SECSuccess) {
+            goto loser;
+        }
     }
     if (names) {
         /* Free old and set the new data. */
@@ -142,6 +145,7 @@ alert_loser:
     ssl3_ExtDecodeError(ss);
 loser:
     if (names) {
+        SECITEM_FreeItem(&names[0], PR_FALSE);
         PORT_Free(names);
     }
     return SECFailure;

@@ -140,11 +140,10 @@ class TlsExtensionTestBase : public TlsConnectTestBase {
   static void InitSimpleSni(DataBuffer* extension) {
     const char* name = "host.name";
     const size_t namelen = PL_strlen(name);
-    extension->Allocate(namelen + 5);
-    extension->Write(0, namelen + 3, 2);
-    extension->Write(2, static_cast<uint32_t>(0), 1);  // 0 == hostname
-    extension->Write(3, namelen, 2);
-    extension->Write(5, reinterpret_cast<const uint8_t*>(name), namelen);
+    extension->Allocate(namelen + 3);
+    extension->Write(0, 0U, 1);  // 0 == hostname
+    extension->Write(1, namelen, 2);
+    extension->Write(3, reinterpret_cast<const uint8_t*>(name), namelen);
   }
 
   void HrrThenRemoveExtensionsTest(SSLExtensionType type, PRInt32 client_error,
@@ -259,30 +258,115 @@ TEST_P(TlsExtensionTestGeneric, TruncateSni) {
 
 // A valid extension that appears twice will be reported as unsupported.
 TEST_P(TlsExtensionTestGeneric, RepeatSni) {
+  DataBuffer simple;
+  InitSimpleSni(&simple);
+
   DataBuffer extension;
-  InitSimpleSni(&extension);
+  extension.Allocate(simple.len() + 2);
+  extension.Write(0, simple.len(), 2);
+  extension.Write(2, simple);
+
   ClientHelloErrorTest(std::make_shared<TlsExtensionInjector>(
                            client_, ssl_server_name_xtn, extension),
                        kTlsAlertIllegalParameter);
 }
 
-// An SNI entry with zero length is considered invalid (strangely, not if it is
-// the last entry, which is probably a bug).
-TEST_P(TlsExtensionTestGeneric, BadSni) {
-  DataBuffer simple;
-  InitSimpleSni(&simple);
+// A SNI ServerNameList must not be empty.
+TEST_P(TlsExtensionTestGeneric, EmptySni) {
   DataBuffer extension;
-  extension.Allocate(simple.len() + 3);
-  extension.Write(0, static_cast<uint32_t>(0), 3);
-  extension.Write(3, simple);
+  extension.Allocate(2);
+  extension.Write(0, 0U, 2);
   ClientHelloErrorTest(std::make_shared<TlsExtensionReplacer>(
       client_, ssl_server_name_xtn, extension));
 }
 
-TEST_P(TlsExtensionTestGeneric, EmptySni) {
+// A SNI ServerNameList can't contain more data than the extension itself.
+TEST_P(TlsExtensionTestGeneric, BadSniLength) {
   DataBuffer extension;
   extension.Allocate(2);
-  extension.Write(0, static_cast<uint32_t>(0), 2);
+  extension.Write(0, 1U, 2);
+  ClientHelloErrorTest(std::make_shared<TlsExtensionReplacer>(
+      client_, ssl_server_name_xtn, extension));
+}
+
+TEST_P(TlsExtensionTestGeneric, BadSniNoHostName) {
+  DataBuffer simple;
+  InitSimpleSni(&simple);
+
+  DataBuffer extension;
+  extension.Allocate(simple.len() + 2 + 1);
+  extension.Write(0, simple.len() + 1, 2);
+  extension.Write(2, simple);
+  extension.Write(2 + simple.len(), 0U, 1);
+
+  ClientHelloErrorTest(std::make_shared<TlsExtensionReplacer>(
+      client_, ssl_server_name_xtn, extension));
+}
+
+TEST_P(TlsExtensionTestGeneric, UnknownSniNameType) {
+  DataBuffer simple;
+  InitSimpleSni(&simple);
+
+  size_t offset = 0;
+  DataBuffer extension;
+  offset = extension.Write(offset, simple.len() + 4, 2);
+
+  // Write a valid HostName.
+  offset = extension.Write(offset, simple);
+
+  // Append an invalid entry, with an unknown NameType.
+  offset = extension.Write(offset, 1U, 1);  // NameType
+  offset = extension.Write(offset, 1U, 2);  // length
+  (void)extension.Write(offset, 'a', 1);    // data
+
+  ClientHelloErrorTest(std::make_shared<TlsExtensionReplacer>(
+      client_, ssl_server_name_xtn, extension));
+}
+
+// A SNI HostName must not be empty.
+TEST_P(TlsExtensionTestGeneric, EmptySniHostName) {
+  DataBuffer extension;
+  extension.Allocate(5);
+  extension.Write(0, 5U, 2);
+  extension.Write(2, 0U, 3);
+  ClientHelloErrorTest(std::make_shared<TlsExtensionReplacer>(
+      client_, ssl_server_name_xtn, extension));
+}
+
+// A SNI HostName must not be empty.
+TEST_P(TlsExtensionTestGeneric, EmptySniHostNameLast) {
+  DataBuffer simple;
+  InitSimpleSni(&simple);
+
+  size_t offset = 0;
+  DataBuffer extension;
+  offset = extension.Write(offset, simple.len() + 3, 2);
+
+  // Write a valid HostName.
+  offset = extension.Write(offset, simple);
+
+  // Append an empty entry.
+  (void)extension.Write(offset, 0U, 3);
+
+  ClientHelloErrorTest(std::make_shared<TlsExtensionReplacer>(
+      client_, ssl_server_name_xtn, extension));
+}
+
+// A SNI HostName must be unique in a ServerNameList.
+TEST_P(TlsExtensionTestGeneric, DuplicateSniHostName) {
+  DataBuffer simple;
+  InitSimpleSni(&simple);
+
+  size_t offset = 0;
+  DataBuffer extension;
+  offset = extension.Write(offset, simple.len() * 2, 2);
+
+  // Write a valid HostName.
+  offset = extension.Write(offset, simple);
+
+  // Append the same HostName again.
+  (void)extension.Write(offset, simple);
+
   ClientHelloErrorTest(std::make_shared<TlsExtensionReplacer>(
       client_, ssl_server_name_xtn, extension));
 }
