@@ -420,6 +420,13 @@ bool TlsRecordFilter::Protect(const TlsRecordHeader& header,
   }
   DataBuffer padded = plaintext;
   padded.Write(padded.len(), inner_content_type, 1);
+
+  // Optional pad for TLSInnerPlaintext.
+  if (padding_ > 0 && inner_content_type == kTlsApplicationDataType) {
+    std::vector<uint8_t> zeros(padding_, 0);
+    padded.Write(padded.len(), zeros.data(), zeros.size());
+  }
+
   return cipher_spec_->Protect(header, padded, ciphertext);
 }
 

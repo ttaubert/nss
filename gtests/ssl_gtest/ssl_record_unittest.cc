@@ -168,6 +168,69 @@ TEST_F(TlsConnectStreamTls13, TooLargeRecord) {
   EXPECT_EQ(SSL_ERROR_RECORD_OVERFLOW_ALERT, PORT_GetError());
 }
 
+TEST_F(TlsConnectStreamTls13, LargePadding) {
+  EnsureTlsSetup();
+
+  const size_t record_limit = 8192;
+  auto replacer = MakeTlsFilter<RecordReplacer>(client_, record_limit);
+  replacer->EnableDecryption();
+  replacer->SetPadding(8192);
+  Connect();
+
+  replacer->Enable();
+  client_->SendData(10);  // This is expanded and padded.
+  WAIT_(server_->received_bytes() == record_limit, 2000);
+  ASSERT_EQ(record_limit, server_->received_bytes());
+}
+
+TEST_F(TlsConnectStreamTls13, PaddingOverflow) {
+  EnsureTlsSetup();
+
+  const size_t record_limit = 16384;
+  auto replacer = MakeTlsFilter<RecordReplacer>(client_, record_limit);
+  replacer->EnableDecryption();
+  replacer->SetPadding(1);
+  Connect();
+
+  replacer->Enable();
+  ExpectAlert(server_, kTlsAlertRecordOverflow);
+  client_->SendData(10);  // This is expanded and padded.
+
+  uint8_t buf[record_limit + 2];
+  PRInt32 rv = PR_Read(server_->ssl_fd(), buf, sizeof(buf));
+  EXPECT_GT(0, rv);
+  EXPECT_EQ(SSL_ERROR_RX_RECORD_TOO_LONG, PORT_GetError());
+
+  // Read the server alert.
+  rv = PR_Read(client_->ssl_fd(), buf, sizeof(buf));
+  EXPECT_GT(0, rv);
+  EXPECT_EQ(SSL_ERROR_RECORD_OVERFLOW_ALERT, PORT_GetError());
+}
+
+TEST_F(TlsConnectStreamTls13, LargePaddingOverflow) {
+  EnsureTlsSetup();
+
+  const size_t record_limit = 8192;
+  auto replacer = MakeTlsFilter<RecordReplacer>(client_, record_limit);
+  replacer->EnableDecryption();
+  replacer->SetPadding(8193);
+  Connect();
+
+  replacer->Enable();
+  ExpectAlert(server_, kTlsAlertRecordOverflow);
+  client_->SendData(10);  // This is expanded and padded.
+
+  uint8_t buf[record_limit + 2];
+  PRInt32 rv = PR_Read(server_->ssl_fd(), buf, sizeof(buf));
+  EXPECT_GT(0, rv);
+  EXPECT_EQ(SSL_ERROR_RX_RECORD_TOO_LONG, PORT_GetError());
+
+  // Read the server alert.
+  rv = PR_Read(client_->ssl_fd(), buf, sizeof(buf));
+  EXPECT_GT(0, rv);
+  EXPECT_EQ(SSL_ERROR_RECORD_OVERFLOW_ALERT, PORT_GetError());
+}
+
 class ShortHeaderChecker : public PacketFilter {
  public:
   PacketFilter::Action Filter(const DataBuffer& input, DataBuffer* output) {

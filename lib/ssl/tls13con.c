@@ -4991,6 +4991,16 @@ tls13_UnprotectRecord(sslSocket *ss,
         }
     }
 
+    /* Check the length of the ciphertext. */
+    if (cText->buf->len > MAX_FRAGMENT_LENGTH + 256) {
+        SSL_TRC(3,
+                ("%d: TLS13[%d]: ciphertext with %d bytes is too long",
+                 SSL_GETPID(), ss->fd, cText->buf->len));
+        *alert = record_overflow;
+        PORT_SetError(SSL_ERROR_RX_RECORD_TOO_LONG);
+        return SECFailure;
+    }
+
     /* Decrypt */
     PORT_Assert(cipher_def->type == type_aead);
     rv = tls13_FormatAdditionalData(ss, cText->hdr, cText->hdrLen,
@@ -5012,6 +5022,16 @@ tls13_UnprotectRecord(sslSocket *ss,
                 ("%d: TLS13[%d]: record has bogus MAC",
                  SSL_GETPID(), ss->fd));
         PORT_SetError(SSL_ERROR_BAD_MAC_READ);
+        return SECFailure;
+    }
+
+    /* Check the length of the plaintext + padding. */
+    if (plaintext->len > MAX_FRAGMENT_LENGTH + 1) {
+        SSL_TRC(3,
+                ("%d: TLS13[%d]: plaintext with %d bytes is too long",
+                 SSL_GETPID(), ss->fd, plaintext->len));
+        *alert = record_overflow;
+        PORT_SetError(SSL_ERROR_RX_RECORD_TOO_LONG);
         return SECFailure;
     }
 

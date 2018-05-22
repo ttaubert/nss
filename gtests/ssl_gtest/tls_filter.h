@@ -100,6 +100,7 @@ class TlsRecordFilter : public PacketFilter {
   TlsRecordFilter(const std::shared_ptr<TlsAgent>& a)
       : agent_(a),
         count_(0),
+        padding_(0),
         cipher_spec_(),
         dropped_record_(false),
         in_sequence_number_(0),
@@ -117,6 +118,8 @@ class TlsRecordFilter : public PacketFilter {
   // Enabling it for lower version tests will cause undefined
   // behavior.
   void EnableDecryption();
+  // Add padding to TLSInnerPlaintext. Only for TLS 1.3 and above.
+  void SetPadding(size_t num_bytes) { padding_ = num_bytes; }
   bool Unprotect(const TlsRecordHeader& header, const DataBuffer& cipherText,
                  uint8_t* inner_content_type, DataBuffer* plaintext);
   bool Protect(const TlsRecordHeader& header, uint8_t inner_content_type,
@@ -152,6 +155,7 @@ class TlsRecordFilter : public PacketFilter {
 
   std::weak_ptr<TlsAgent> agent_;
   size_t count_;
+  size_t padding_;
   std::unique_ptr<TlsCipherSpec> cipher_spec_;
   // Whether we dropped a record since the cipher spec changed.
   bool dropped_record_;
