@@ -1,6 +1,14 @@
 {
     "DisabledTests": {
         "### These tests break whenever we rev versions, so just leave them here for easy uncommenting":"",
+        "TLS13Draft23-HRR-InvalidCompressionMethod":"We send illegal_parameter, BoGo wants decode_error",
+        "ALPNClient-RejectUnknown-TLS13Draft23":"NSS sends alerts in response to errors in protected handshake messages in the clear",
+        "ClientSkipCertificateVerify-TLS13Draft23":"NSS sends alerts in response to errors in protected handshake messages in the clear",
+        "ServerSkipCertificateVerify-TLS13Draft23":"NSS sends alerts in response to errors in protected handshake messages in the clear",
+        "TooManyChangeCipherSpec-Client-TLS13Draft23":"NSS doesn't have an upper limit for CCS messages in compat mode.",
+        "TooManyChangeCipherSpec-Server-TLS13Draft23":"NSS doesn't have an upper limit for CCS messages in compat mode.",
+        "EmptySessionID-TLS13Draft23":"NSS doesn't enter compat mode if the client sends an empty SessionID.",
+        "*-TLS13Draft23":"NSS supports draft 28 only.",
         "ServerBogusVersion":"Check that SH.legacy_version=TLS12 when the server picks TLS 1.3 (Bug 1443761)",
         "DummyPQPadding-Server*":"Boring is testing a dummy PQ padding extension",
         "VerifyPreferences-Enforced":"NSS sends alerts in response to errors in protected handshake messages in the clear",
@@ -12,7 +20,6 @@
         "ServerCipherFilter*":"Add Ed25519 support (Bug 1325335)",
         "GarbageCertificate*":"Send bad_certificate alert when certificate parsing fails (Bug 1441565)",
         "SupportedVersionSelection-TLS12":"Should maybe reject TLS 1.2 in SH.supported_versions (Bug 1438266)",
-        "*TLS13*":"(NSS=19, BoGo=18)",
         "*HelloRetryRequest*":"(NSS=19, BoGo=18)",
         "*KeyShare*":"(NSS=19, BoGo=18)",
         "*EncryptedExtensions*":"(NSS=19, BoGo=18)",
